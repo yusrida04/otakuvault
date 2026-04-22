@@ -1,7 +1,3 @@
--- OtakuVault Database Schema
--- Run this file to initialize the database
-
--- Create users table
 CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY,
   username VARCHAR(50) UNIQUE NOT NULL,
@@ -67,3 +63,19 @@ INSERT INTO media (title, type, genre, description, cover_url, total_episodes, s
 ('Lookism', 'manhwa', 'Slice of Life, Action', 'An unattractive boy switches bodies with a handsome one while sleeping.', 'https://picsum.photos/seed/lk/300/400', 450, 'ongoing', 2014, 'Taejun Pak'),
 ('Hollow Knight', 'game', 'Metroidvania, Action', 'Explore a vast underground kingdom of insects and heroes.', 'https://picsum.photos/seed/hk/300/400', NULL, 'completed', 2017, 'Team Cherry')
 ON CONFLICT DO NOTHING;
+
+-- Chapter Notes table (tanggapan per chapter)
+CREATE TABLE IF NOT EXISTS chapter_notes (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  media_id INTEGER NOT NULL REFERENCES media(id) ON DELETE CASCADE,
+  chapter_number INTEGER NOT NULL,
+  chapter_title VARCHAR(255),
+  note TEXT NOT NULL,
+  mood VARCHAR(30) DEFAULT 'neutral' CHECK (mood IN ('mindblown', 'hype', 'sad', 'angry', 'cry', 'laugh', 'love', 'confused', 'bored', 'neutral')),
+  cover_url TEXT DEFAULT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_chapter_notes_user_media ON chapter_notes(user_id, media_id);
