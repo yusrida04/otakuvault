@@ -26,19 +26,15 @@ export default function HomePage() {
       try {
         const mediaRes = await api.get('/media?limit=6');
         setFeatured(mediaRes.data.data);
+        setStats({ total: mediaRes.data.pagination?.total || 0 });
 
-        const total = mediaRes.data.pagination?.total || 0;
-        setStats({ total });
-
+        // Stats hanya kalau login
         if (user) {
           const statsRes = await api.get('/collections/stats');
           setUserStats(statsRes.data.data);
         }
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
+      } catch (err) { console.error(err); }
+      finally { setLoading(false); }
     };
     fetchData();
   }, [user]);

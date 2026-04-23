@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';  // ← tambah Link
 import { useAuth } from '../context/AuthContext';
 import api from '../utils/api';
 import MediaCard from '../components/ui/MediaCard';
@@ -7,8 +7,7 @@ import MediaCard from '../components/ui/MediaCard';
 const TYPES = ['all', 'anime', 'manhwa', 'manga', 'game', 'comic'];
 const TYPE_EMOJI = { anime: '🎌', manhwa: '📖', manga: '📚', game: '🎮', comic: '💥', all: '🌐' };
 
-// ── AddMediaModal ──────────────────────────────────────────────────────────────
-
+// ── AddMediaModal (tidak berubah, sama seperti sebelumnya) ─────────────────────
 function AddMediaModal({ onClose, onSaved }) {
   const [form, setForm] = useState({
     title: '', type: 'anime', genre: '', description: '',
@@ -42,19 +41,14 @@ function AddMediaModal({ onClose, onSaved }) {
       <div className="glass rounded-2xl p-6 w-full max-w-lg border border-white/10 animate-in max-h-[92vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-5">
           <h3 className="font-display font-bold text-xl text-white">➕ Tambah Media Baru</h3>
-          <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors text-xl leading-none">✕</button>
+          <button onClick={onClose} className="text-gray-400 hover:text-white text-xl">✕</button>
         </div>
-
         {error && <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2.5 text-red-400 text-sm mb-4">{error}</div>}
-
         <div className="space-y-4">
-          {/* Title */}
           <div>
             <label className="text-xs text-gray-400 font-semibold uppercase tracking-wide mb-1.5 block">Judul *</label>
             <input type="text" placeholder="e.g. Solo Leveling" className="input-field" value={form.title} onChange={set('title')} />
           </div>
-
-          {/* Type + Status */}
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="text-xs text-gray-400 font-semibold uppercase tracking-wide mb-1.5 block">Tipe *</label>
@@ -73,8 +67,6 @@ function AddMediaModal({ onClose, onSaved }) {
               </select>
             </div>
           </div>
-
-          {/* Genre + Studio */}
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="text-xs text-gray-400 font-semibold uppercase tracking-wide mb-1.5 block">Genre</label>
@@ -85,12 +77,10 @@ function AddMediaModal({ onClose, onSaved }) {
               <input type="text" placeholder="MAPPA, FromSoftware" className="input-field" value={form.studio} onChange={set('studio')} />
             </div>
           </div>
-
-          {/* Episodes + Year */}
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="text-xs text-gray-400 font-semibold uppercase tracking-wide mb-1.5 block">
-                {form.type === 'game' ? 'Estimasi Jam' : form.type === 'manhwa' || form.type === 'manga' || form.type === 'comic' ? 'Jumlah Chapter' : 'Jumlah Episode'}
+                {form.type === 'game' ? 'Estimasi Jam' : ['manhwa','manga','comic'].includes(form.type) ? 'Jumlah Chapter' : 'Jumlah Episode'}
               </label>
               <input type="number" min="1" placeholder="opsional" className="input-field" value={form.total_episodes} onChange={set('total_episodes')} />
             </div>
@@ -99,8 +89,6 @@ function AddMediaModal({ onClose, onSaved }) {
               <input type="number" min="1900" max={new Date().getFullYear() + 2} className="input-field" value={form.release_year} onChange={set('release_year')} />
             </div>
           </div>
-
-          {/* Cover URL + preview */}
           <div>
             <label className="text-xs text-gray-400 font-semibold uppercase tracking-wide mb-1.5 block">🖼️ URL Cover</label>
             <input type="url" placeholder="https://contoh.com/cover.jpg" className="input-field" value={form.cover_url} onChange={set('cover_url')} />
@@ -111,14 +99,11 @@ function AddMediaModal({ onClose, onSaved }) {
               </div>
             )}
           </div>
-
-          {/* Description */}
           <div>
             <label className="text-xs text-gray-400 font-semibold uppercase tracking-wide mb-1.5 block">Sinopsis</label>
             <textarea rows={3} placeholder="Ceritakan singkat tentang media ini..." className="input-field resize-none text-sm" value={form.description} onChange={set('description')} />
           </div>
         </div>
-
         <div className="flex gap-2 mt-5">
           <button onClick={onClose} className="btn-secondary flex-1 py-2.5">Batal</button>
           <button onClick={handleSubmit} disabled={loading} className="btn-primary flex-1 py-2.5">
@@ -138,12 +123,13 @@ function AddMediaModal({ onClose, onSaved }) {
 export default function BrowsePage() {
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [media, setMedia]         = useState([]);
-  const [loading, setLoading]     = useState(true);
-  const [pagination, setPagination] = useState({ total: 0, page: 1, totalPages: 1 });
-  const [search, setSearch]       = useState('');
-  const [collection, setCollection] = useState({});
+  const [media, setMedia]               = useState([]);
+  const [loading, setLoading]           = useState(true);
+  const [pagination, setPagination]     = useState({ total: 0, page: 1, totalPages: 1 });
+  const [search, setSearch]             = useState('');
+  const [collection, setCollection]     = useState({});
   const [showAddModal, setShowAddModal] = useState(false);
+  const [isPreview, setIsPreview]       = useState(false); // ✅ state di level komponen
 
   const activeType = searchParams.get('type') || 'all';
   const page       = parseInt(searchParams.get('page') || '1');
@@ -153,13 +139,19 @@ export default function BrowsePage() {
     try {
       const params = new URLSearchParams({ page, limit: 12 });
       if (activeType !== 'all') params.append('type', activeType);
-      if (search) params.append('search', search);
+      if (search && user) params.append('search', search);
+      
       const res = await api.get(`/media?${params}`);
+      
       setMedia(res.data.data);
       setPagination(res.data.pagination);
-    } catch (err) { console.error(err); }
-    finally { setLoading(false); }
-  }, [activeType, page, search]);
+      setIsPreview(res.data.isPreview || false); // ✅ simpan flag dari backend
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, [activeType, page, search, user]);
 
   const fetchCollection = useCallback(async () => {
     try {
@@ -206,7 +198,6 @@ export default function BrowsePage() {
           <p className="text-gray-400 mt-1">{pagination.total} titles available</p>
         </div>
         <div className="flex gap-2 flex-wrap">
-          {/* Search */}
           <form onSubmit={handleSearch} className="flex gap-2">
             <input
               type="text"
@@ -221,13 +212,8 @@ export default function BrowsePage() {
               </svg>
             </button>
           </form>
-
-          {/* Tombol tambah — hanya kalau login */}
           {user && (
-            <button
-              onClick={() => setShowAddModal(true)}
-              className="btn-accent py-2 px-4 flex items-center gap-2 text-sm font-semibold"
-            >
+            <button onClick={() => setShowAddModal(true)} className="btn-accent py-2 px-4 flex items-center gap-2 text-sm font-semibold">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
@@ -240,20 +226,33 @@ export default function BrowsePage() {
       {/* Type filter */}
       <div className="flex gap-2 flex-wrap">
         {TYPES.map(type => (
-          <button
-            key={type}
-            onClick={() => handleTypeChange(type)}
+          <button key={type} onClick={() => handleTypeChange(type)}
             className={`px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-200 capitalize flex items-center gap-1.5 ${
-              activeType === type
-                ? 'bg-primary-600 text-white shadow-lg shadow-primary-900/30'
-                : 'glass-hover text-gray-400'
-            }`}
-          >
+              activeType === type ? 'bg-primary-600 text-white shadow-lg shadow-primary-900/30' : 'glass-hover text-gray-400'
+            }`}>
             <span>{TYPE_EMOJI[type]}</span>
             {type === 'all' ? 'Semua' : type.charAt(0).toUpperCase() + type.slice(1)}
           </button>
         ))}
       </div>
+
+      {/* ✅ Preview Banner — di dalam return(), SETELAH type filter */}
+      {isPreview && (
+        <div className="glass rounded-2xl p-5 border border-primary-500/20 flex flex-col sm:flex-row items-center gap-4">
+          <div className="text-4xl">🔒</div>
+          <div className="flex-1 text-center sm:text-left">
+            <p className="text-white font-display font-bold text-lg">Lihat lebih banyak konten!</p>
+            <p className="text-gray-400 text-sm mt-1">
+              Kamu sedang melihat <span className="text-primary-400 font-semibold">6 preview</span> dari ratusan anime, manhwa, dan game.
+              Login untuk akses penuh + fitur koleksi & AI tutor!
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Link to="/login" className="btn-secondary py-2 px-4 text-sm">Login</Link>
+            <Link to="/register" className="btn-primary py-2 px-4 text-sm">Daftar Gratis</Link>
+          </div>
+        </div>
+      )}
 
       {/* Grid */}
       {loading ? (
@@ -273,12 +272,7 @@ export default function BrowsePage() {
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
           {media.map(m => (
-            <MediaCard
-              key={m.id}
-              media={m}
-              collectionEntry={collection[m.id]}
-              onCollectionUpdate={fetchCollection}
-            />
+            <MediaCard key={m.id} media={m} collectionEntry={collection[m.id]} onCollectionUpdate={fetchCollection} />
           ))}
         </div>
       )}
@@ -302,12 +296,8 @@ export default function BrowsePage() {
         </div>
       )}
 
-      {/* Add Media Modal */}
       {showAddModal && (
-        <AddMediaModal
-          onClose={() => setShowAddModal(false)}
-          onSaved={() => { fetchMedia(); setShowAddModal(false); }}
-        />
+        <AddMediaModal onClose={() => setShowAddModal(false)} onSaved={() => { fetchMedia(); setShowAddModal(false); }} />
       )}
     </div>
   );

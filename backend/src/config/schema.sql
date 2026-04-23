@@ -76,6 +76,21 @@ CREATE TABLE IF NOT EXISTS game_collection (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS ai_characters (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  media_id INTEGER NOT NULL REFERENCES media(id) ON DELETE CASCADE,
+  name VARCHAR(100) NOT NULL,
+  tagline VARCHAR(255),
+  description TEXT NOT NULL,
+  greeting TEXT NOT NULL,
+  avatar_url TEXT,
+  subject VARCHAR(20) DEFAULT 'english'
+    CHECK (subject IN ('english', 'japanese', 'math')),
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_ai_characters_media ON ai_characters(media_id);
 CREATE INDEX IF NOT EXISTS idx_game_journal_user_media ON game_journal(user_id, media_id);
 CREATE INDEX IF NOT EXISTS idx_game_collection_user_media ON game_collection(user_id, media_id);
 CREATE INDEX IF NOT EXISTS idx_collections_user_id ON collections(user_id);

@@ -4,43 +4,43 @@ import pool from '../config/database.js';
 export const getAllMedia = async (req, res) => {
   try {
     const { type, genre, search, page = 1, limit = 12 } = req.query;
-    const offset = (page - 1) * limit;
-    
+    const isLoggedIn = !!req.user;
+
+    // Kalau belum login, batasi hanya 6 item sebagai preview
+    const effectiveLimit = isLoggedIn ? parseInt(limit) : 6;
+    const effectivePage  = isLoggedIn ? parseInt(page)  : 1;
+    const offset         = (effectivePage - 1) * effectiveLimit;
+
     let query = 'SELECT * FROM media WHERE 1=1';
     const params = [];
     let paramIdx = 1;
 
-    if (type) {
-      query += ` AND type = $${paramIdx++}`;
-      params.push(type);
-    }
-    if (genre) {
-      query += ` AND genre ILIKE $${paramIdx++}`;
-      params.push(`%${genre}%`);
-    }
-    if (search) {
-      query += ` AND (title ILIKE $${paramIdx} OR description ILIKE $${paramIdx})`;
-      params.push(`%${search}%`);
-      paramIdx++;
+    if (type)   { query += ` AND type = $${paramIdx++}`;                            params.push(type); }
+    if (genre)  { query += ` AND genre ILIKE $${paramIdx++}`;                       params.push(`%${genre}%`); }
+    if (search && isLoggedIn) {
+      query += ` AND (title ILIKE $${paramIdx} OR description ILIKE $${paramIdx})`; 
+      params.push(`%${search}%`); paramIdx++;
     }
 
-    const countQuery = query.replace('SELECT *', 'SELECT COUNT(*)');
-    const countResult = await pool.query(countQuery, params);
+    const countResult = await pool.query(
+      query.replace('SELECT *', 'SELECT COUNT(*)'), params
+    );
     const total = parseInt(countResult.rows[0].count);
 
     query += ` ORDER BY created_at DESC LIMIT $${paramIdx++} OFFSET $${paramIdx++}`;
-    params.push(parseInt(limit), parseInt(offset));
+    params.push(effectiveLimit, offset);
 
     const result = await pool.query(query, params);
 
     return res.status(200).json({
       success: true,
       data: result.rows,
+      isPreview: !isLoggedIn,   // ← flag untuk frontend
       pagination: {
-        total,
-        page: parseInt(page),
-        limit: parseInt(limit),
-        totalPages: Math.ceil(total / limit)
+        total: isLoggedIn ? total : Math.min(total, 6),
+        page: effectivePage,
+        limit: effectiveLimit,
+        totalPages: isLoggedIn ? Math.ceil(total / effectiveLimit) : 1,
       }
     });
   } catch (err) {
