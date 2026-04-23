@@ -41,6 +41,43 @@ CREATE TABLE IF NOT EXISTS collections (
 );
 
 -- Indexes for performance
+-- Game journal entries (strategi, catatan misi)
+CREATE TABLE IF NOT EXISTS game_journal (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  media_id INTEGER NOT NULL REFERENCES media(id) ON DELETE CASCADE,
+  entry_type VARCHAR(20) NOT NULL DEFAULT 'strategy'
+    CHECK (entry_type IN ('strategy', 'mission', 'tip', 'story')),
+  title VARCHAR(255) NOT NULL,
+  content TEXT NOT NULL,
+  difficulty VARCHAR(20) DEFAULT 'medium'
+    CHECK (difficulty IN ('easy', 'medium', 'hard', 'extreme')),
+  tags VARCHAR(255),
+  cover_url TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Game collection (skin, hero, item, build)
+CREATE TABLE IF NOT EXISTS game_collection (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  media_id INTEGER NOT NULL REFERENCES media(id) ON DELETE CASCADE,
+  item_type VARCHAR(20) NOT NULL DEFAULT 'skin'
+    CHECK (item_type IN ('skin', 'hero', 'weapon', 'build', 'item', 'achievement')),
+  name VARCHAR(255) NOT NULL,
+  description TEXT,
+  rarity VARCHAR(20) DEFAULT 'common'
+    CHECK (rarity IN ('common', 'rare', 'epic', 'legendary', 'mythic')),
+  image_url TEXT,
+  is_owned BOOLEAN DEFAULT TRUE,
+  power_rating INTEGER CHECK (power_rating >= 0 AND power_rating <= 100),
+  availability VARCHAR(50),
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_game_journal_user_media ON game_journal(user_id, media_id);
+CREATE INDEX IF NOT EXISTS idx_game_collection_user_media ON game_collection(user_id, media_id);
 CREATE INDEX IF NOT EXISTS idx_collections_user_id ON collections(user_id);
 CREATE INDEX IF NOT EXISTS idx_collections_media_id ON collections(media_id);
 CREATE INDEX IF NOT EXISTS idx_media_type ON media(type);

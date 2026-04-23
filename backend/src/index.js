@@ -5,6 +5,7 @@ import authRoutes from './routes/auth.js';
 import mediaRoutes from './routes/media.js';
 import collectionRoutes from './routes/collections.js';
 import chapterRoutes from './routes/chapters.js';
+import gameRoutes from './routes/game.js';
 
 dotenv.config();
 
@@ -30,6 +31,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/media', mediaRoutes);
 app.use('/api/collections', collectionRoutes);
 app.use('/api/chapters', chapterRoutes);
+app.use('/api/game', gameRoutes);  
 
 // Health check
 app.get('/api/health', (req, res) => {
