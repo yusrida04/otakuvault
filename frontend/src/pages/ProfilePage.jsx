@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../utils/api';
+import MALSync from '../components/ui/MALSync';
 
 export default function ProfilePage() {
   const { user, updateUser } = useAuth();
@@ -79,6 +80,11 @@ export default function ProfilePage() {
           >
             {editing ? 'Cancel' : '✏️ Edit Profile'}
           </button>
+          {/* ← TAMBAH INI */}
+          <MALSync onSyncComplete={() => {
+            // Refresh stats setelah sync
+            api.get('/collections/stats').then(res => setStats(res.data.data)).catch(() => {});
+          }} />
         </div>
 
         {/* Edit form */}

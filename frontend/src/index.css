@@ -35,7 +35,8 @@
 
 @layer components {
   .glass {
-    @apply bg-white/5 backdrop-blur-sm border border-white/10;
+    /* Tambahin saturate biar warna di belakangnya lebih keluar */
+    @apply bg-white/5 backdrop-blur-md saturate-150 border border-white/10;
   }
 
   .glass-hover {
@@ -59,7 +60,9 @@
   }
 
   .input-field {
-    @apply w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-gray-100 placeholder-gray-500 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all duration-200;
+    @apply w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-gray-100 
+        placeholder-gray-500 focus:outline-none focus:border-primary-500 
+          focus:ring-2 focus:ring-primary-500/50 transition-all duration-200;
   }
 
   .card {
@@ -106,5 +109,26 @@
 
   .animate-in {
     animation: slideUp 0.4s ease-out forwards;
+  }
+}
+
+/* Global z-index fixes */
+.navbar-dropdown {
+  z-index: 9999 !important;
+}
+
+/* Pastikan semua fixed modal overlay di atas segalanya */
+[data-modal="true"] {
+  z-index: 9998;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

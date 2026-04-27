@@ -190,14 +190,15 @@ export default function BrowsePage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+    <div className="relative z-0 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="page-title">Browse</h1>
           <p className="text-gray-400 mt-1">{pagination.total} titles available</p>
         </div>
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex gap-2 flex-wrap items-center">
+          {/* Search */}
           <form onSubmit={handleSearch} className="flex gap-2">
             <input
               type="text"
@@ -212,8 +213,13 @@ export default function BrowsePage() {
               </svg>
             </button>
           </form>
+
+          {/* Tombol Tambah — pastikan tidak overlap dengan navbar */}
           {user && (
-            <button onClick={() => setShowAddModal(true)} className="btn-accent py-2 px-4 flex items-center gap-2 text-sm font-semibold">
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="btn-accent py-2 px-4 flex items-center gap-2 text-sm font-semibold flex-shrink-0"
+            >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
@@ -222,6 +228,7 @@ export default function BrowsePage() {
           )}
         </div>
       </div>
+      {/* ... sisa konten ... */}
 
       {/* Type filter */}
       <div className="flex gap-2 flex-wrap">

@@ -7,6 +7,7 @@ import collectionRoutes from './routes/collections.js';
 import chapterRoutes from './routes/chapters.js';
 import gameRoutes from './routes/game.js';
 import characterRoutes from './routes/characters.js';
+import syncRoutes from './routes/sync.js'; 
 
 dotenv.config();
 
@@ -34,6 +35,7 @@ app.use('/api/collections', collectionRoutes);
 app.use('/api/chapters', chapterRoutes);
 app.use('/api/game', gameRoutes);  
 app.use('/api/characters', characterRoutes);
+app.use('/api/sync', syncRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import api from '../utils/api';
 import MediaCard from '../components/ui/MediaCard';
+import MALSync from '../components/ui/MALSync';
 
 const STATUS_TABS = [
   { key: 'all', label: '🌐 All', },
@@ -53,6 +54,10 @@ export default function CollectionPage() {
       <div>
         <h1 className="page-title">My Collection</h1>
         <p className="text-gray-400 mt-1">{totalItems} items in your vault</p>
+      </div>
+      {/* ← TAMBAH INI */}
+      <div className="ml-auto">
+        <MALSync onSyncComplete={fetchCollection} />
       </div>
 
       {/* Stats */}
