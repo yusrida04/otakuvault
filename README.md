@@ -438,7 +438,7 @@ CLIENT_URL      = https://otakuvault.vercel.app
 7. Railway otomatis isi `DATABASE_URL` — atau copy credentials dari tab **"Connect"**
 8. Buka **"Query"** tab di PostgreSQL plugin → paste isi `schema.sql` → Run
 9. Klik **"Deploy"** → tunggu build selesai
-10. Copy URL backend: `https://otakuvault-production.up.railway.app`
+10. Copy URL backend: `otakuvault-production.up.railway.app`
 
 ### Frontend — [Vercel](https://vercel.com) (Free)
 1. Import repo ke Vercel
