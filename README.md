@@ -418,12 +418,12 @@ npm run dev
 2. Copy connection string
 3. Buka SQL Editor → paste isi `schema.sql` → Run
 
-### Backend — [Render.com](https://render.com) (Free)
-1. New → Web Service → connect GitHub repo
-2. Root Directory: `backend`
-3. Build Command: `npm install`
-4. Start Command: `npm start`
-5. Environment Variables:
+### Backend — [Railway](https://railway.app) (Free Trial / Paid)
+1. Daftar di railway.app (bisa pakai GitHub)
+2. Klik **"New Project"** → **"Deploy from GitHub repo"**
+3. Pilih repo `otakuvault` → pilih folder `backend` sebagai root
+4. Railway otomatis deteksi Node.js
+5. Buka tab **"Variables"** → tambahkan semua env:
 ```
 DB_HOST         = (dari Neon)
 DB_PORT         = 5432
@@ -434,6 +434,11 @@ JWT_SECRET      = your_production_secret
 GROQ_API_KEY    = gsk_xxxxxxxxxxxxxxxxxxxx
 CLIENT_URL      = https://otakuvault.vercel.app
 ```
+6. Tambah **PostgreSQL plugin**: klik **"New"** → **"Database"** → **"PostgreSQL"**
+7. Railway otomatis isi `DATABASE_URL` — atau copy credentials dari tab **"Connect"**
+8. Buka **"Query"** tab di PostgreSQL plugin → paste isi `schema.sql` → Run
+9. Klik **"Deploy"** → tunggu build selesai
+10. Copy URL backend: `https://otakuvault-production.up.railway.app`
 
 ### Frontend — [Vercel](https://vercel.com) (Free)
 1. Import repo ke Vercel
