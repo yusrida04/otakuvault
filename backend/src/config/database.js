@@ -5,12 +5,14 @@ dotenv.config();
 
 const { Pool } = pg;
 
+// Cek apakah kita di production (Railway) atau di lokal
+const isProduction = process.env.NODE_ENV === 'production' || process.env.DATABASE_URL;
+
 const pool = new Pool({
-  host: process.env.DB_HOST || 'localhost',
-  port: process.env.DB_PORT || 5432,
-  database: process.env.DB_NAME || 'otakuvault',
-  user: process.env.DB_USER || 'postgres',
-  password: process.env.DB_PASSWORD || 'Yusrida01',
+  // Pakai connectionString supaya langsung baca satu baris DATABASE_URL dari Railway
+  connectionString: process.env.DATABASE_URL,
+  // WAJIB: Tambahkan ini supaya bisa konek ke database online
+  ssl: isProduction ? { rejectUnauthorized: false } : false
 });
 
 pool.on('connect', () => {
@@ -19,7 +21,8 @@ pool.on('connect', () => {
 
 pool.on('error', (err) => {
   console.error('❌ PostgreSQL error:', err);
-  process.exit(-1);
+  // Jangan langsung exit di production supaya server nggak gampang mati
+  if (!isProduction) process.exit(-1);
 });
 
 export default pool;
