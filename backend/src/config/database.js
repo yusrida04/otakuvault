@@ -1,28 +1,32 @@
 import pg from 'pg';
 import dotenv from 'dotenv';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 dotenv.config();
-
 const { Pool } = pg;
-
-// Cek apakah kita di production (Railway) atau di lokal
-const isProduction = process.env.NODE_ENV === 'production' || process.env.DATABASE_URL;
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const pool = new Pool({
-  // Pakai connectionString supaya langsung baca satu baris DATABASE_URL dari Railway
   connectionString: process.env.DATABASE_URL,
-  // WAJIB: Tambahkan ini supaya bisa konek ke database online
-  ssl: isProduction ? { rejectUnauthorized: false } : false
+  ssl: { rejectUnauthorized: false }
 });
 
-pool.on('connect', () => {
-  console.log('✅ Connected to PostgreSQL');
-});
+// FUNGSI OTOMATIS JALANKAN SCHEMA.SQL
+const initDB = async () => {
+  try {
+    // Sesuaikan path ini dengan lokasi file schema.sql kamu
+    const sqlPath = path.join(__dirname, '../../schema.sql'); 
+    const sql = fs.readFileSync(sqlPath, 'utf8');
+    
+    await pool.query(sql);
+    console.log("✅ Database Schema & Sample Data Berhasil Dimasukkan!");
+  } catch (err) {
+    console.error("❌ Gagal Inisialisasi Database:", err.message);
+  }
+};
 
-pool.on('error', (err) => {
-  console.error('❌ PostgreSQL error:', err);
-  // Jangan langsung exit di production supaya server nggak gampang mati
-  if (!isProduction) process.exit(-1);
-});
+initDB();
 
 export default pool;
