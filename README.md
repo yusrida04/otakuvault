@@ -443,9 +443,11 @@ CLIENT_URL      = https://otakuvault.vercel.app
 ### Frontend — [Vercel](https://vercel.com) (Free)
 1. Import repo ke Vercel
 2. Root Directory: `frontend`
-3. Environment Variables:
+3. Build Command : `npm run build`
+4. Output Directory : `dist`
+5. Environment Variables:
 ```
-VITE_API_URL = https://otakuvault-api.onrender.com
+VITE_API_URL = https://otakuvault-production.up.railway.app
 ```
 4. Deploy!
 
