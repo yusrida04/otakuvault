@@ -3,8 +3,7 @@
 > Platform tracking koleksi untuk Gen Z yang suka anime, manhwa, manga, game, dan komik.  
 > Dilengkapi AI Tutor karakter, Game Journal, Chapter Notes, dan Sync dari MyAnimeList!
 
-![Netlify Status](https://img.shields.io/badge/Netlify-Live-00C7B7?style=for-the-badge&logo=netlify)
-![Railway Status](https://img.shields.io/badge/Railway-Backend-0B0D0E?style=for-the-badge&logo=railway)
+**🔗 Live Demo:** [otakuvault-id.netlify.app](https://otakuvault-id.netlify.app)
 
 ### 🔗 Links
 - **Frontend:** [https://otakuvault-id.netlify.app](https://otakuvault-id.netlify.app)
